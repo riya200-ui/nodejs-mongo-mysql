@@ -23,7 +23,7 @@ app.use('/start',path)
 
 //connect to mongodb database
 //const URI = 'mongodb+srv://auth-11:auth@cluster0.hxsje.mongodb.net/leadgeneration?retryWrites=true&w=majority'
-const URI = process.env.MONGODB_URL ?? ""
+/*const URI = process.env.MONGODB_URL ?? ""
 mongoose.connect(
     URI,
 
@@ -42,7 +42,38 @@ mongoose.connect(
             console.log("Error in the connectivity");
             }
         }
-);
+);*/
+
+//connect  to database mysql
+
+const dbConfig = require('./config');
+
+const Sequelize = require('sequelize');
+
+const sequelize = new Sequelize(dbConfig.DB,dbConfig.USER,dbConfig.PASSWORD,{
+    host :dbConfig.HOST,
+    dialect:dbConfig.dialect,
+    logging: true,
+    operatorsAliases: false
+
+})
+sequelize.authenticate()
+.then(()=> {
+    console.log("db connected")
+}).catch(()=> {
+    console.log('db not connected')
+})
+
+const db = {};
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
+
+db.sequelize.sync()
+.then(()=> {
+    console.log('yes is sync')
+}).catch(()=> {
+    console.log('not sync')
+})
 
 const port = 8000;
 app.listen(port ,()=> {
