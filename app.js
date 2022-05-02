@@ -5,9 +5,44 @@ const app = express();
 This method returns the middleware that only parses JSON and only looks at the requests where the content-type header matches the type option.*/
 app.use(express.json());
 
+const bodyParser = require('body-parser')
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
+
+const morgan = require('morgan');
+app.use(morgan("dev"));
+
+const mongoose = require('mongoose');
+
 app.get('/',(req,res)=> {
     res.status(200).json('app is start')
 })
+
+const path = require('./src/routes/index')
+app.use('/start',path)
+
+//connect to mongodb database
+//const URI = 'mongodb+srv://auth-11:auth@cluster0.hxsje.mongodb.net/leadgeneration?retryWrites=true&w=majority'
+const URI = process.env.MONGODB_URL ?? ""
+mongoose.connect(
+    URI,
+
+    {
+        useNewUrlParser : true,
+        useUnifiedTopology: true,
+        useCreateIndex:true,
+        useFindAndModify: false
+    },
+
+    (err)=>{
+        if(err) {
+            console.log("successful connection with the server");
+                }
+         else{
+            console.log("Error in the connectivity");
+            }
+        }
+);
 
 const port = 8000;
 app.listen(port ,()=> {
